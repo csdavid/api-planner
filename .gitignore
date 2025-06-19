@@ -1,3 +1,4 @@
 __pycache__/
 planner.db
 venv/
+.env
