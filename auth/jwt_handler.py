@@ -12,6 +12,8 @@ def create_access_token(user: str) -> str:
     payload = {"user": user, "expires": time.time() + 3600}  # Token valid for 1 hour
 
     token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+    print("*********************************************************")
+    print(f"Generated token: {token}")
     return token
 
 
