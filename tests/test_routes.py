@@ -74,3 +74,53 @@ async def test_get_events_count(default_client: httpx.AsyncClient) -> None:
 
     assert response.status_code == 200
     assert len(events) == 0
+
+
+@pytest.mark.asyncio
+async def test_update_event(
+    default_client: httpx.AsyncClient, mock_event: Event, access_token: str
+) -> None:
+    test_payload = {
+        "title": "Updated FastAPI event",
+    }
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {access_token}",
+    }
+
+    url = f"/event/{str(mock_event.id)}"
+    response = await default_client.put(url, json=test_payload, headers=headers)
+
+    assert response.status_code == 200
+    assert response.json()["title"] == test_payload["title"]
+
+
+@pytest.mark.asyncio
+async def test_delete_event(
+    default_client: httpx.AsyncClient, mock_event: Event, access_token: str
+) -> None:
+    test_response = {"message": "Event deleted successfully"}
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {access_token}",
+    }
+
+    url = f"/event/{mock_event.id}"
+    response = await default_client.delete(url, headers=headers)
+
+    assert response.status_code == 200
+    assert response.json() == test_response
+
+
+@pytest.mark.asyncio
+async def test_delete_event_not_found(
+    default_client: httpx.AsyncClient, mock_event: Event
+) -> None:
+    url = f"/event/{str(mock_event.id)}"
+    response = await default_client.get(url)
+
+    assert response.status_code == 200
+    assert response.json()["creator"] == mock_event.creator
+    assert response.json()["_id"] == str(mock_event.id)

@@ -1,5 +1,20 @@
 import httpx
 import pytest
+from typing import AsyncGenerator
+from models.users import User
+from auth.hash_password import HashPassword
+
+
+@pytest.fixture(scope="function")
+async def mock_user() -> AsyncGenerator[User, None]:
+    new_user = User(
+        email="testuser@packt.com",
+        password=HashPassword().create_hash("testpassword"),
+        events=[],
+    )
+    await new_user.insert()
+    yield new_user
+    await new_user.delete()
 
 
 @pytest.mark.asyncio
@@ -21,7 +36,9 @@ async def test_sign_new_user(default_client: httpx.AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_signin_user_in(default_client: httpx.AsyncClient) -> None:
+async def test_signin_user_in(
+    default_client: httpx.AsyncClient, mock_user: User
+) -> None:
     payload = {
         "username": "testuser@packt.com",
         "password": "testpassword",

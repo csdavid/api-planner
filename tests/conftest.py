@@ -29,4 +29,4 @@ async def default_client():
         yield client
         # Clean up resources
         await Event.find_all().delete()
-        # await User.find_all().delete()
+        await User.find_all().delete()
